@@ -23,7 +23,10 @@ The Expense Reimbursement System (ERS) will manage the process of reimbursing em
 
 
 # Getting Started
-<li>Step 1:  git clone </li>
+<li>Step 1:  git clone https://github.com/ricksnp/Reimbursement.git onto your machine </li>
+<li>Step 2:  Open the project in an environment in which you have a Tomcat Server Runtime Environment </li>
+<li>Step 3:  Once inside an appropriate environment, start the Tomcat server runtime </li>
+<li>Step 4:  View http://localhost:8080/Reimbursement/ in the browser of your choice </li>
 
 # Display
 <img src="login.JPG">
