@@ -22,6 +22,9 @@ The Expense Reimbursement System (ERS) will manage the process of reimbursing em
 <li>Display all or only relevant reimbursements</li>
 
 
+# Getting Started
+<li>Step 1:  git clone </li>
+
 # Display
 <img src="login.JPG">
 
