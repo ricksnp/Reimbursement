@@ -21,4 +21,8 @@ The Expense Reimbursement System (ERS) will manage the process of reimbursing em
 <li>Remove users from the system</li>
 <li>Display all or only relevant reimbursements</li>
 
+<img src="login.JPG">
+
 <img src="employee.JPG">
+
+<img src="manager.JPG">
