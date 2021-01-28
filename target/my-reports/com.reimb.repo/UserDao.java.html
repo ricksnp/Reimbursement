@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Reimbursement</a> &gt; <a href="index.source.html" class="el_package">com.reimb.repo</a> &gt; <span class="el_source">UserDao.java</span></div><h1>UserDao.java</h1><pre class="source lang-java linenums">package com.reimb.repo;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import com.reimb.config.EnvironmentConnectionUtil;
+import com.reimb.model.User;
+
+public class UserDao implements DaoContract&lt;User, Integer&gt;{
+	
+	
+<span class="fc" id="L15">EnvironmentConnectionUtil ev = new EnvironmentConnectionUtil();</span>
+	
+
+	@Override
+	public List&lt;User&gt; findAll() {
+		// TODO Auto-generated method stub
+<span class="nc" id="L21">		return null;</span>
+	}
+
+
+	@Override
+	public User findById(Integer i) {
+		// TODO Auto-generated method stub
+<span class="nc" id="L28">		return null;</span>
+	}
+
+
+	@Override
+	public int update(User t) {
+		// TODO Auto-generated method stub
+<span class="nc" id="L35">		return 0;</span>
+	}
+
+
+	@Override
+	public boolean create(User t) {
+		
+<span class="fc" id="L42">		Connection conn = ev.getConnection();</span>
+		
+<span class="fc" id="L44">		String sql = &quot;insert into reimbursement.ers_users (ers_username, ers_password, user_first_name, user_last_name, user_email, user_role_id) values(?,?,?,?,?, 2);&quot;;</span>
+		
+		try {
+<span class="fc" id="L47">			PreparedStatement ps = conn.prepareStatement(sql);</span>
+<span class="fc" id="L48">			ps.setString(1, t.getUsername());</span>
+<span class="fc" id="L49">			ps.setString(2, t.getPassword());</span>
+<span class="fc" id="L50">			ps.setString(3, t.getFirstName());</span>
+<span class="fc" id="L51">			ps.setString(4, t.getLastName());</span>
+<span class="fc" id="L52">			ps.setString(5, t.getEmail());</span>
+<span class="fc" id="L53">			ps.executeUpdate();</span>
+			
+<span class="fc" id="L55">			conn.close();</span>
+<span class="fc" id="L56">			return true;</span>
+			
+<span class="nc" id="L58">		} catch (SQLException e) {</span>
+<span class="nc" id="L59">			e.printStackTrace();</span>
+		}
+<span class="nc" id="L61">		return false;</span>
+
+	} 
+
+	@Override
+	public boolean delete(String name) {
+		try {
+<span class="fc" id="L68">			Connection conn = ev.getConnection();</span>
+<span class="fc" id="L69">			String sql = &quot;delete from reimbursement.ers_users where ers_username = ?&quot;;</span>
+<span class="fc" id="L70">			PreparedStatement pstmt = conn.prepareStatement(sql);</span>
+<span class="fc" id="L71">			pstmt.setString(1, name);</span>
+<span class="fc" id="L72">			pstmt.executeUpdate();</span>
+<span class="fc" id="L73">			return true;</span>
+
+<span class="nc" id="L75">		} catch (SQLException e) {</span>
+<span class="nc" id="L76">			e.printStackTrace();</span>
+		}
+<span class="nc" id="L78">		return false;</span>
+	}
+
+
+	@Override
+	public User findByName(String name) {
+		// TODO Auto-generated method stub
+<span class="nc" id="L85">		return null;</span>
+	}
+
+<span class="fc" id="L88">	public UserDao() {</span>
+		
+<span class="fc" id="L90">	}</span>
+	
+	public User findByUsernameAndPassword(String username, String password) {
+		
+<span class="fc" id="L94">		Connection conn = ev.getConnection();</span>
+		
+<span class="fc" id="L96">		String sql = &quot;select * from reimbursement.view2 where ers_username = ? and ers_password = ? &quot;;</span>
+		
+		try {
+<span class="fc" id="L99">			PreparedStatement ps = conn.prepareStatement(sql);</span>
+<span class="fc" id="L100">			ps.setString(1, username);</span>
+<span class="fc" id="L101">			ps.setString(2, password);</span>
+<span class="fc" id="L102">			ps.executeQuery();</span>
+<span class="fc" id="L103">			ResultSet rs = ps.executeQuery();</span>
+			
+<span class="fc bfc" id="L105" title="All 2 branches covered.">			while (rs.next()) {</span>
+<span class="fc" id="L106">				User u = new User(rs.getInt(&quot;ers_users_id&quot;), username, password, rs.getString(&quot;user_first_name&quot;), rs.getString(&quot;user_last_name&quot;), rs.getString(&quot;user_email&quot;), </span>
+<span class="fc" id="L107">													  rs.getInt(&quot;user_role_id&quot;), rs.getString(&quot;user_role&quot;));</span>
+			
+<span class="fc" id="L109">				rs.close();</span>
+<span class="fc" id="L110">				conn.close();</span>
+<span class="fc" id="L111">				return u;</span>
+			}
+			
+<span class="nc" id="L114">		} catch (SQLException e) {</span>
+<span class="nc" id="L115">			e.printStackTrace();</span>
+		}
+<span class="fc" id="L117">		return null;</span>
+	} 
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

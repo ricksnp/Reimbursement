@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Reimbursement</a> &gt; <a href="index.source.html" class="el_package">com.reimb.controller</a> &gt; <span class="el_source">LoginController.java</span></div><h1>LoginController.java</h1><pre class="source lang-java linenums">package com.reimb.controller;
+
+import java.util.List;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import com.reimb.model.User;
+import com.reimb.repo.ReimbursementDao;
+import com.reimb.repo.UserDao;
+
+public class LoginController {
+
+	public HttpServletRequest request;
+	public HttpServletResponse response;
+
+<span class="fc" id="L20">	public LoginController(HttpServletRequest request, HttpServletResponse response) {</span>
+<span class="fc" id="L21">		this.request = request;</span>
+<span class="fc" id="L22">		this.response = response;</span>
+<span class="fc" id="L23">	}</span>
+
+	public boolean LoginRequest() throws IOException {
+<span class="nc" id="L26">		String username = request.getParameter(&quot;username&quot;);</span>
+<span class="nc" id="L27">		String password = request.getParameter(&quot;password&quot;);</span>
+<span class="nc" id="L28">		return loginUserNameAndPassword(username, password);</span>
+	}
+	
+	public boolean loginUserNameAndPassword(String username, String password) throws IOException {
+
+<span class="fc" id="L33">		String md5Pass = md5(username + password + &quot;pepper&quot;);</span>
+
+<span class="fc" id="L35">		User u = new UserDao().findByUsernameAndPassword(username, md5Pass);</span>
+
+<span class="fc bfc" id="L37" title="All 2 branches covered.">		if (u == null) {</span>
+<span class="fc" id="L38">			say(&quot;&lt;h1&gt; No such user: &quot; + username + &quot; or invalid password&lt;/h1&gt;&quot;);</span>
+<span class="fc" id="L39">			return false;</span>
+		}
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">		else if (u.getRoleName().equals(&quot;Employee&quot;)) {</span>
+<span class="fc" id="L43">			say(&quot;&lt;!DOCTYPE html&gt;&quot; + &quot;&lt;html&gt;&quot;</span>
+					+ &quot;&lt;head&gt;&lt;link rel=\&quot;stylesheet\&quot; href=\&quot;Reimbursement/css/employee.css\&quot;&gt; &lt;/head&gt;&quot; + &quot;&lt;body&gt;&quot;
+<span class="fc" id="L45">					+ &quot;&lt;h1&gt; Welcome back, &quot; + u.getUsername() + &quot;&lt;/h1&gt;&quot;</span>
+<span class="fc" id="L46">					+ &quot;&lt;table class = employeeTable id=employeeTable &gt;&quot;);</span>
+<span class="fc" id="L47">			new ReimbursementController(request, response).retrieveReimbursementsByUserId(u.getUserId());</span>
+<span class="fc" id="L48">			say(&quot;&lt;/table&gt;&quot; + &quot;&lt;div id = \&quot;newreimb\&quot;&gt;&lt;form id = form action = \&quot;NewReimbursement\&quot; method = \&quot;post\&quot;&gt;&quot;</span>
+<span class="fc" id="L49">					+ &quot;&lt;input type=\&quot;hidden\&quot; name=\&quot;username\&quot; id=\&quot;username\&quot; value=&quot; + username + &quot;&gt;&quot;</span>
+<span class="fc" id="L50">					+ &quot;&lt;input type=\&quot;hidden\&quot; name=\&quot;author\&quot; id=\&quot;author\&quot;   value=&quot; + u.getUserId() + &quot;&gt;&quot;</span>
+<span class="fc" id="L51">					+ &quot;&lt;input type=\&quot;hidden\&quot; name=\&quot;password\&quot; id=\&quot;password\&quot; value=&quot; + password + &quot;&gt;&quot;</span>
+<span class="fc" id="L52">					+ &quot;&lt;label for = amount&gt;Amount:&lt;/label&gt;&quot;</span>
+<span class="fc" id="L53">					+ &quot;&lt;input type=\&quot;text\&quot;   placeholder=\&quot;amount\&quot; id=\&quot;amount\&quot; name=\&quot;amount\&quot;&gt;&quot;</span>
+<span class="fc" id="L54">					+ &quot;&lt;label for = reason&gt;Description:&lt;/label&gt;&quot;</span>
+<span class="fc" id="L55">					+ &quot;&lt;input type=\&quot;text\&quot;   placeholder=\&quot;reason\&quot; id=\&quot;reason\&quot; name=\&quot;desc\&quot;&gt;&quot;</span>
+<span class="fc" id="L56">					+ &quot;&lt;label for=\&quot;type\&quot;&gt;Choose a type:&lt;/label&gt;&quot; + &quot;&lt;select id=\&quot;type\&quot; name=\&quot;type\&quot;&gt;&quot;</span>
+<span class="fc" id="L57">					+ &quot;&lt;option value=\&quot;1\&quot;&gt;Travel&lt;/option&gt;&quot; + &quot;&lt;option value=\&quot;2\&quot;&gt;Business&lt;/option&gt;&quot;</span>
+<span class="fc" id="L58">					+ &quot;&lt;option value=\&quot;3\&quot;&gt;Healthcare&lt;/option&gt;&quot; + &quot;&lt;option value=\&quot;4\&quot;&gt;Food&lt;/option&gt;&quot;</span>
+<span class="fc" id="L59">					+ &quot;&lt;option value=\&quot;5\&quot;&gt;Other&lt;/option&gt;&quot; + &quot;&lt;/select&gt;&quot;</span>
+<span class="fc" id="L60">					+ &quot;&lt;input type=\&quot;submit\&quot; id = submit value=\&quot;Submit new ticket\&quot;&gt;&quot; + &quot;&lt;/form&gt;&lt;/div&gt;&quot;</span>
+
+<span class="fc" id="L62">					+ &quot;&lt;script src = \&quot;Reimbursement/javascript/reimb.js\&quot;&gt;&lt;/script&gt;&quot; + &quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+<span class="fc" id="L63">			return true;</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">		} else if (u.getRoleName().equals(&quot;Manager&quot;)) {</span>
+<span class="fc" id="L65">			displayManager(u);</span>
+<span class="fc" id="L66">			return true;</span>
+		}
+
+		else {
+<span class="nc" id="L70">			say(&quot;&lt;h1&gt; NO such role&quot; + u.getRoleName() + &quot;&lt;/h1&gt;&quot;);</span>
+<span class="nc" id="L71">			return false;</span>
+		}
+	}
+
+	public void displayManager(User u) throws IOException {
+<span class="fc" id="L76">		say(&quot;&lt;!DOCTYPE html&gt;&quot; + &quot;&lt;html&gt;&quot;</span>
+				+ &quot;&lt;head&gt; &lt;link rel=\&quot;stylesheet\&quot; href=\&quot;Reimbursement/css/manager.css\&quot;&gt; &lt;/head&gt;&quot;
+				+ &quot;&lt;body&gt; &lt;h1&gt; All Reimbursements &lt;/h1&gt; &quot;);
+<span class="fc" id="L79">		Float f = new ReimbursementDao().viewTotalReimbursements();</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">		if (f != null) say(&quot;&lt;p&gt;Total outstanding reimbursements: &quot;+f+&quot;&lt;/p&gt;&quot;);</span>
+
+<span class="fc" id="L82">		say(&quot;&lt;form action = \&quot;UpdateStatus\&quot; method = \&quot;post\&quot;&gt;&lt;table&gt;&quot;);</span>
+<span class="fc" id="L83">		List&lt;Integer&gt; remIds = new ReimbursementController(request, response).retrieveAllReimbursements();</span>
+<span class="fc" id="L84">		String result = &quot;&quot;;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">		for (Integer rem : remIds) {</span>
+<span class="fc" id="L86">			result += rem + &quot; &quot;;</span>
+		}
+<span class="fc" id="L88">		say(&quot;&lt;/table&gt;&quot;</span>
+		 +&quot;&lt;div id = \&quot;filter\&quot;&gt;&lt;input type=\&quot;checkbox\&quot; id=\&quot;showPending\&quot; name=\&quot;showPending\&quot;&gt;&quot; 
+		 +&quot;&lt;label for=\&quot;showPending\&quot;&gt; Show Pending&lt;/label&gt;&lt;br&gt;&quot; 
+		 +&quot;&lt;input type=\&quot;checkbox\&quot; id=\&quot;showRejected\&quot; name=\&quot;showRejected\&quot;&gt;&quot; 
+		 +&quot;&lt;label for=\&quot;showRejected\&quot;&gt; Show Rejected&lt;/label&gt;&lt;br&gt;&quot; 
+		 +&quot;&lt;input type=\&quot;checkbox\&quot; id=\&quot;showAccepted\&quot; name=\&quot;showAccepted\&quot;&gt;&quot; 
+		 +&quot;&lt;label for=\&quot;showAccepted\&quot;&gt; Show Accepted&lt;/label&gt;&lt;br&gt;&quot; 
+		 +&quot;&lt;input type=\&quot;button\&quot; id = filterButton value=\&quot;Filter\&quot;&gt;&quot; 
+		 +&quot;&lt;input type=\&quot;submit\&quot; id = \&quot;updateButton\&quot; value=\&quot;Update\&quot;&gt;&quot; 
+<span class="fc" id="L97">		 +&quot;&lt;input type=\&quot;hidden\&quot; value=\&quot;&quot; + result + &quot;\&quot; name = \&quot;remIdList\&quot; id = remIdList&gt;&quot; </span>
+<span class="fc" id="L98">		 +&quot;&lt;input type=\&quot;hidden\&quot; value=\&quot;&quot; + u.getUserId() + &quot;\&quot; name = \&quot;resolverId\&quot;&gt;&lt;/div&gt;&lt;/form&gt;&quot;</span>
+		 
+<span class="fc" id="L100">		 +&quot;&lt;h2&gt;Make new employee&lt;/h2&gt;&quot;</span>
+		 
+<span class="fc" id="L102">		 + &quot;&lt;form id = makeEmployee&gt;&quot;</span>
+<span class="fc" id="L103">		 + &quot;&lt;table&gt;&quot;</span>
+<span class="fc" id="L104">		 + &quot;&lt;tr&gt;&lt;td&gt;New Employee Name&quot;</span>
+<span class="fc" id="L105">		 +&quot; &lt;td&gt;&lt;input type = text id = newEmpUserName placeholder = \&quot;Employee Username\&quot;  name = newEmpUserName&gt;&quot;</span>
+<span class="fc" id="L106">		 + &quot;&lt;tr&gt;&lt;td&gt;New Employee Password&quot;</span>
+<span class="fc" id="L107">		 +&quot;&lt;td&gt;&lt;input type = text id = newEmpPassword placeholder = \&quot;Employee Password\&quot;  name = newEmpPassword&gt;&quot;</span>
+<span class="fc" id="L108">		 + &quot;&lt;tr&gt;&lt;td&gt;New Employee First Name&quot;</span>
+<span class="fc" id="L109">		 +&quot;&lt;td&gt;&lt;input type = text id = newEmpFirstName placeholder = \&quot;Employee First Name\&quot;  name = newEmpFirstName&gt;&quot;</span>
+<span class="fc" id="L110">		 + &quot;&lt;tr&gt;&lt;td&gt;New Employee Last Name&quot;</span>
+<span class="fc" id="L111">		 +&quot;&lt;td&gt;&lt;input type = text id = newEmpLastName placeholder = \&quot;Employee Last Name\&quot;  name = newEmpEmail&gt;&quot;</span>
+<span class="fc" id="L112">		 + &quot;&lt;tr&gt;&lt;td&gt;New Employee Email&quot;</span>
+<span class="fc" id="L113">		 +&quot;&lt;td&gt;&lt;input type = text id = newEmpEmail placeholder = \&quot;Employee Email\&quot;  name = newEmpEmail&gt;&quot;</span>
+<span class="fc" id="L114">		 +&quot;&lt;tr&gt;&lt;td&gt;&lt;input type=\&quot;submit\&quot; id = \&quot;submitNewEmp\&quot; value=\&quot;Create Employee\&quot;&gt;&quot; </span>
+<span class="fc" id="L115">		 + &quot;&lt;/table&gt;&quot;</span>
+<span class="fc" id="L116">		 + &quot;&lt;/form&gt;&quot;</span>
+<span class="fc" id="L117">		 +&quot;&lt;/body&gt; &lt;script src=\&quot;Reimbursement/javascript/filter.js\&quot;&gt;&lt;/script&gt;&lt;/html&gt;&quot;); </span>
+<span class="fc" id="L118">	}</span>
+
+	void say(String s) throws IOException {
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">		if (response != null) response.getWriter().print(s);</span>
+<span class="fc" id="L122">	}</span>
+
+	public static String md5(String input) {
+
+		try {
+
+			// Static getInstance method is called with hashing MD5
+<span class="fc" id="L129">			MessageDigest md = MessageDigest.getInstance(&quot;MD5&quot;);</span>
+
+			// digest() method is called to calculate message digest
+			// of an input digest() return array of byte
+<span class="fc" id="L133">			byte[] messageDigest = md.digest(input.getBytes());</span>
+
+			// Convert byte array into signum representation
+<span class="fc" id="L136">			BigInteger no = new BigInteger(1, messageDigest);</span>
+
+			// Convert message digest into hex value
+<span class="fc" id="L139">			String hashtext = no.toString(16);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">			while (hashtext.length() &lt; 32) {</span>
+<span class="nc" id="L141">				hashtext = &quot;0&quot; + hashtext;</span>
+			}
+<span class="fc" id="L143">			return hashtext;</span>
+		}
+
+<span class="nc" id="L146">		catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L147">			throw new RuntimeException(e);</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

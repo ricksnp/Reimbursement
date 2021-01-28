@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NewEmployeeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Reimbursement</a> &gt; <a href="index.source.html" class="el_package">com.reimb.controller</a> &gt; <span class="el_source">NewEmployeeController.java</span></div><h1>NewEmployeeController.java</h1><pre class="source lang-java linenums">package com.reimb.controller;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+
+import com.reimb.model.User;
+import com.reimb.repo.UserDao;
+
+public class NewEmployeeController {
+	
+	public HttpServletRequest request;
+	public HttpServletResponse response;
+<span class="fc" id="L17">	Logger logger = Logger.getLogger(&quot;NewEmployeeController&quot;);</span>
+	public static String result;
+	
+<span class="fc" id="L20">	public NewEmployeeController(HttpServletRequest request, HttpServletResponse response) {</span>
+<span class="fc" id="L21">		this.request = request;</span>
+<span class="fc" id="L22">		this.response = response;</span>
+<span class="fc" id="L23">	}</span>
+	
+	
+	public void NewEmployee() throws IOException  {
+<span class="nc" id="L27">		String newEmpUserName  = request.getParameter(&quot;newEmpUserName&quot;),</span>
+<span class="nc" id="L28">		newEmpPassword         = request.getParameter(&quot;newEmpPassword&quot;),</span>
+<span class="nc" id="L29">		newEmpFirstName        = request.getParameter(&quot;newEmpFirstName&quot;),</span>
+<span class="nc" id="L30">		newEmpLastName         = request.getParameter(&quot;newEmpLastName&quot;),</span>
+<span class="nc" id="L31">		newEmpEmail            = request.getParameter(&quot;newEmpEmail&quot;);</span>
+		
+<span class="nc" id="L33">		addEmployee(new User( 0, newEmpUserName, newEmpPassword, newEmpFirstName, newEmpLastName,newEmpEmail, 2, &quot;&quot;));</span>
+<span class="nc" id="L34">	}</span>
+	
+	public boolean addEmployee(User u) throws IOException {
+		
+<span class="fc" id="L38">		final boolean addedEmployee = new UserDao().create(u);</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">		if (addedEmployee) {</span>
+<span class="fc" id="L40">			say(&quot;Successfully added employee &quot; + u.getUsername());</span>
+<span class="fc" id="L41">		}</span>
+		
+		else {
+<span class="nc" id="L44">			say(&quot;Was not able to add employee &quot; + u.getUsername());</span>
+		}
+<span class="fc" id="L46">		return addedEmployee;</span>
+	}
+	
+	void say(String s) throws IOException {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">		if(response != null)response.getWriter().print(s); //response is null when we're testing</span>
+<span class="fc" id="L51">		logger.info(s);</span>
+<span class="fc" id="L52">		result = s;</span>
+
+<span class="fc" id="L54">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

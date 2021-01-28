@@ -1,0 +1,13 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Reimbursement,com.reimb.servlet,RequestForwarder,81,0,16,0,14,0,12,0,2,0
+Reimbursement,com.reimb.servlet,NewReimbursement,25,0,0,0,7,0,3,0,3,0
+Reimbursement,com.reimb.repo,ReimbursementDao,20,75,0,0,11,19,5,3,5,3
+Reimbursement,com.reimb.repo,UserDao,21,128,0,2,12,34,4,5,4,4
+Reimbursement,com.reimb.controller,CheckLoginController,68,0,2,0,15,0,4,0,3,0
+Reimbursement,com.reimb.controller,NewEmployeeController,55,44,2,2,8,14,3,3,1,3
+Reimbursement,com.reimb.controller,ReimbursementController,65,317,2,10,13,75,3,8,1,4
+Reimbursement,com.reimb.controller,StatusController,119,0,2,0,27,0,4,0,3,0
+Reimbursement,com.reimb.controller,LoginController,48,280,4,10,8,69,5,8,1,5
+Reimbursement,com.reimb.config,EnvironmentConnectionUtil,3,28,0,0,1,9,0,2,0,2
+Reimbursement,com.reimb.model,Reimbursement,27,39,0,0,14,14,7,7,7,7
+Reimbursement,com.reimb.model,User,44,48,0,0,21,17,10,8,10,8

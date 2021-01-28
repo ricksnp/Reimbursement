@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReimbursementController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Reimbursement</a> &gt; <a href="index.source.html" class="el_package">com.reimb.controller</a> &gt; <span class="el_source">ReimbursementController.java</span></div><h1>ReimbursementController.java</h1><pre class="source lang-java linenums">package com.reimb.controller;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.reimb.config.EnvironmentConnectionUtil;
+import com.reimb.model.Reimbursement;
+import com.reimb.repo.ReimbursementDao;
+
+public class ReimbursementController {
+	public HttpServletRequest request;
+	public HttpServletResponse response;
+	
+<span class="fc" id="L22">	public ReimbursementController(HttpServletRequest request, HttpServletResponse response) {</span>
+<span class="fc" id="L23">		this.request  = request;</span>
+<span class="fc" id="L24">		this.response = response;</span>
+<span class="fc" id="L25">	}</span>
+
+	public void reimbursementRequest() throws IOException {
+
+<span class="nc" id="L29">		double amount = Double.parseDouble(request.getParameter(&quot;amount&quot;));</span>
+<span class="nc" id="L30">		String description = request.getParameter(&quot;desc&quot;);</span>
+<span class="nc" id="L31">		int author = Integer.parseInt(request.getParameter(&quot;author&quot;));</span>
+<span class="nc" id="L32">		int type = Integer.parseInt(request.getParameter(&quot;type&quot;));</span>
+
+<span class="nc" id="L34">		Reimbursement r = new Reimbursement(amount, description, author, 1, 1, type);</span>
+<span class="nc" id="L35">		ReimbursementDao rd = new ReimbursementDao();</span>
+
+<span class="nc" id="L37">		rd.create(r);</span>
+<span class="nc" id="L38">		say(&quot;&lt;table&gt;&quot;);</span>
+<span class="nc" id="L39">		retrieveReimbursementsByUserId(author);</span>
+<span class="nc" id="L40">		say(&quot;&lt;/table&gt;&quot;);</span>
+<span class="nc" id="L41">	}</span>
+
+	public int retrieveReimbursementsByUserId(int author) throws IOException {
+<span class="fc" id="L44">		int count = 0;</span>
+		try {
+<span class="fc" id="L46">			EnvironmentConnectionUtil ev = new EnvironmentConnectionUtil();</span>
+<span class="fc" id="L47">			Connection conn = ev.getConnection();</span>
+<span class="fc" id="L48">			String query = &quot;select * from reimbursement.view1 where reimb_author = ? &quot;;</span>
+<span class="fc" id="L49">			PreparedStatement pstmt = conn.prepareStatement(query);</span>
+<span class="fc" id="L50">			pstmt.setInt(1, author);</span>
+<span class="fc" id="L51">			ResultSet rs = pstmt.executeQuery();</span>
+			
+<span class="fc" id="L53">			say(&quot;&lt;tr&gt;&lt;th&gt;Amount&lt;th&gt;Description&lt;th&gt;Resolver First Name&lt;th&gt;Resolver Last name&lt;th&gt;Email&lt;th&gt;Status&lt;th&gt;Reason&lt;/tr&gt;&quot;);</span>
+			
+<span class="fc bfc" id="L55" title="All 2 branches covered.">			while (rs.next()) {</span>
+<span class="fc" id="L56">				int amount = rs.getInt(&quot;reimb_amount&quot;);</span>
+<span class="fc" id="L57">				String desc = rs.getString(&quot;reimb_description&quot;);</span>
+<span class="fc" id="L58">				String firstname = rs.getString(&quot;user_first_name&quot;);</span>
+<span class="fc" id="L59">				String lastname = rs.getString(&quot;user_last_name&quot;);</span>
+<span class="fc" id="L60">				String statusname = rs.getString(&quot;reimb_status&quot;);</span>
+<span class="fc" id="L61">				String email = rs.getString(&quot;user_email&quot;);</span>
+<span class="fc" id="L62">				String reason = rs.getString(&quot;reimb_type&quot;);</span>
+<span class="fc" id="L63">				count++;</span>
+<span class="fc" id="L64">				say(	&quot;&lt;tr&gt;&lt;td class = amount&gt;&quot;+amount+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L65">						+ &quot;&lt;td class = desc&gt;&quot;+desc+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L66">						+ &quot;&lt;td class = firstname&gt;&quot;+firstname+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L67">						+ &quot;&lt;td class = lastname&gt;&quot;+lastname+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L68">						+ &quot;&lt;td class = email&gt;&quot;+email+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L69">						+ &quot;&lt;td class = statusname&gt;&quot;+statusname+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L70">						+ &quot;&lt;td class = reason&gt;&quot;+reason+&quot;&lt;/td&gt;&quot;);</span>
+			}
+<span class="fc" id="L72">			rs.close();</span>
+<span class="fc" id="L73">			conn.close();</span>
+
+<span class="pc" id="L75">		} catch (SQLException e) {</span>
+<span class="nc" id="L76">			e.printStackTrace();</span>
+		}
+<span class="fc" id="L78">		return count;</span>
+	}
+	
+	public List&lt;Integer&gt; retrieveAllReimbursements() throws IOException {
+<span class="fc" id="L82">		List&lt;Integer&gt; remIds = new ArrayList&lt;&gt;();</span>
+		try {
+<span class="fc" id="L84">			EnvironmentConnectionUtil ev = new EnvironmentConnectionUtil();</span>
+<span class="fc" id="L85">			Connection conn = ev.getConnection();</span>
+<span class="fc" id="L86">			String query = &quot;select * from reimbursement.view1&quot;;</span>
+<span class="fc" id="L87">			PreparedStatement pstmt = conn.prepareStatement(query);</span>
+<span class="fc" id="L88">			ResultSet rs = pstmt.executeQuery();</span>
+				
+<span class="fc" id="L90">			say(&quot;&lt;tr&gt;&lt;th&gt;First Name&lt;th&gt;Last Name&lt;th&gt;Amount&lt;th&gt;Description&lt;th&gt;Resolver First Name&lt;th&gt;Resolver Last name&lt;th&gt;Email&lt;th&gt;Reason&lt;th&gt;Approve/Reject&lt;/tr&gt;&quot;);</span>
+			
+<span class="fc bfc" id="L92" title="All 2 branches covered.">			while (rs.next()) {</span>
+<span class="fc" id="L93">				int amount = rs.getInt(&quot;reimb_amount&quot;);</span>
+<span class="fc" id="L94">				String desc = rs.getString(&quot;reimb_description&quot;);</span>
+<span class="fc" id="L95">				String firstname = rs.getString(&quot;user_first_name&quot;);</span>
+<span class="fc" id="L96">				String lastname = rs.getString(&quot;user_last_name&quot;);</span>
+<span class="fc" id="L97">				String statusname = rs.getString(&quot;reimb_status&quot;);</span>
+<span class="fc" id="L98">				String email = rs.getString(&quot;user_email&quot;);</span>
+<span class="fc" id="L99">				String reason = rs.getString(&quot;reimb_type&quot;);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">				String p = statusname.equals(&quot;Pending&quot;)? &quot;selected&quot;:&quot;&quot;;</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">				String r = statusname.equals(&quot;Rejected&quot;)? &quot;selected&quot;:&quot;&quot;;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">				String a = statusname.equals(&quot;Approved&quot;)? &quot;selected&quot;:&quot;&quot;;</span>
+<span class="fc" id="L103">				String authorFirstName = rs.getString(&quot;authorfirstname&quot;);</span>
+<span class="fc" id="L104">				String authorLastName = rs.getString(&quot;authorlastname&quot;);</span>
+				
+<span class="fc" id="L106">				int reimbId = rs.getInt(&quot;reimb_id&quot;);</span>
+<span class="fc" id="L107">				remIds.add(reimbId);</span>
+				
+<span class="fc" id="L109">				say(	&quot;&lt;tr id =  \&quot;filterRow&quot;+reimbId+&quot;\&quot; &gt;&quot;</span>
+<span class="fc" id="L110">						+ &quot;&lt;td class&gt;&quot;+authorFirstName+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L111">						+ &quot;&lt;td class&gt;&quot;+authorLastName+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L112">						+ &quot;&lt;td class = amount&gt;&quot;+amount+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L113">						+ &quot;&lt;td class = desc&gt;&quot;+desc+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L114">						+ &quot;&lt;td class = firstname&gt;&quot;+firstname+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L115">						+ &quot;&lt;td class = lastname&gt;&quot;+lastname+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L116">						+ &quot;&lt;td class = email&gt;&quot;+email+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L117">						+ &quot;&lt;td class = reason&gt;&quot;+reason+&quot;&lt;/td&gt;&quot;</span>
+<span class="fc" id="L118">						+ &quot;&lt;td class = status&gt;&quot;+</span>
+<span class="fc" id="L119">				        &quot;&lt;select id=\&quot;type&quot;+reimbId+&quot;\&quot; name=\&quot;type&quot; + reimbId + &quot;\&quot;&gt;&quot;+</span>
+<span class="fc" id="L120">				          &quot;&lt;option value=\&quot;1\&quot; &quot;+p+&quot;&gt;Pending&lt;/option&gt;&quot;+</span>
+<span class="fc" id="L121">				          &quot;&lt;option value=\&quot;2\&quot; &quot;+r+&quot;&gt;Rejected&lt;/option&gt;&quot;+</span>
+<span class="fc" id="L122">				          &quot;&lt;option value=\&quot;3\&quot; &quot;+a+&quot;&gt;Approved&lt;/option&gt;&quot;+</span>
+<span class="fc" id="L123">				        &quot;&lt;/select&gt;&lt;/td&gt;&quot;);</span>
+			}
+<span class="fc" id="L125">			rs.close();</span>
+<span class="fc" id="L126">			conn.close();</span>
+
+<span class="pc" id="L128">		} catch (SQLException e) {</span>
+<span class="nc" id="L129">			e.printStackTrace();</span>
+		}
+<span class="fc" id="L131">		return remIds;</span>
+	}
+	
+	void say(String s) throws IOException {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">		if (response != null) response.getWriter().print(s);</span>
+<span class="fc" id="L136">	}</span>
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

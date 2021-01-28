@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="Reimbursement/css/index.css">
+</head>
+<body>
+	<div id=logincontainer>
+		<form class="box" id=form action="login" method="post">
+			<h1>Login</h1>
+			<input type="text" id=username placeholder="Username" name="username">
+			<input type="password" id=password placeholder="Password"
+				name="password"> <input type="submit" id=submit
+				value="Login">
+		</form>
+	</div>
+	<div id=message></div>
+</body>
+<script>form.onsubmit = function (event){
+		event.preventDefault();
+		if(!/\S+/.test(username.value)){
+			alert("Username cannot be empty!");
+			return;
+		}
+		
+		if(!/\S+/.test(password.value)){
+			alert("Password cannot be empty!");
+			return;
+		}
+	  	const url = "http://localhost:8080/Reimbursement/login?"+`username=${username.value}&password=${password.value}`
+	  			
+	  	console.log(url);
+	  	
+	  	fetch(url , {method: 'POST'})
+	    .then((response) => {
+	    	console.log(response)
+	    	response.text().then(function (text) {
+	    	message.innerHTML = text;
+	    	if (!/No such user/.test(text)){
+	    		logincontainer.innerHTML = "";
+	    		if(typeof makeEmployee !== 'undefined'){makeEmployee.onsubmit = makeEmployeeOnSubmit;}
+	    		if(typeof filterButton !== 'undefined') {filterButton.onclick = filterButtonOnClick;}
+			}
+	    	    if(typeof newTicket !== 'undefined'){
+	    	    	newTicket.onsubmit = newTicketOnSubmit;
+	    	    	}
+	    	    
+	    	    if(typeof buttonMakeEmployee !== 'undefined'){
+	    	    	buttonMakeEmployee.onclick = showMakeEmployeeForm;
+	    	    	}
+	    	    
+	    	    if(typeof updateButton !== 'undefined'){
+	    	    	updateButton.onclick = updateTicketsOnSubmit;
+	    	    	}
+	    	    
+	    	    
+	    	    
+	    	    updateTicketsOnSubmit
+	     })
+	})
+}
+
+
+ function makeEmployeeOnSubmit (event){
+	console.log("we are in AAAAAAA");
+	event.preventDefault();
+	
+	if(!/\S+/.test(newEmpUserName.value)){
+		alert("Username cannot be empty!");
+		return;
+	}
+	
+	if(!/\S+/.test(newEmpPassword.value)){
+		alert("Password cannot be empty!");
+		return;
+	}
+	
+	if(!/\S+/.test(newEmpFirstName.value)){
+		alert("First name cannot be empty!");
+		return;
+	}
+	
+	if(!/\S+/.test(newEmpLastName.value)){
+		alert("Last name cannot be empty!");
+		return;
+	}
+	if(!/\S+/.test(newEmpEmail.value)){
+		alert("Email cannot be empty!");
+		return;
+	}
+	
+  	const url = "http://localhost:8080/Reimbursement/NewEmployee?"+
+  		`newEmpUserName=${newEmpUserName.value}&newEmpPassword=${newEmpPassword.value}&newEmpFirstName=${newEmpFirstName.value}&`+
+  			`newEmpLastName=${newEmpLastName.value}&newEmpEmail=${newEmpEmail.value}`;
+  			
+  	console.log(url);
+  	fetch(url , {method: 'POST'})
+    .then((response) => {
+    console.log(response)
+    response.text().then(function (text) {
+    alert(text);
+	});
+    
+    }
+   )
+}
+ 
+
+function filterButtonOnClick (event) {
+	const remIdList = document.getElementById("remIdList");
+	const remIds = remIdList.value.split(" ");
+	const showPending = document.getElementById("showPending").checked;
+	const showRejected = document.getElementById("showRejected").checked;
+	const showAccepted = document.getElementById("showAccepted").checked;
+
+	for (remId of remIds) {
+		console.log(remId);
+		const select = document.getElementById("type" + remId);
+		if (select) {
+			const row = document.getElementById("filterRow" + remId);
+			if ((showPending && select.value == 1) ||(showRejected && select.value == 2) ||(showAccepted && select.value == 3)){
+				row.style.visibility = "visible";
+			}
+
+			else {
+				row.style.visibility = "hidden";
+			}
+		}
+	}
+}
+
+
+ function newTicketOnSubmit (event){
+	event.preventDefault();
+	if(!/^\d+\.\d+/.test(amount.value)){
+		alert("Amount must be a number in $0.00 format!");
+		return;
+	}
+	
+	if(!/\S+/.test(reason.value)){
+		alert("Please enter a description!");
+		return;
+	}
+	
+  	const url = "http://localhost:8080/Reimbursement/NewReimbursement?"+
+  		`username=${username.value}&password=${password.value}&amount=${amount.value}&`+
+  			`desc=${reason.value}&author=${author.value}&type=${type.value}`;
+  			
+  	console.log(url);
+  	fetch(url , {method: 'POST'})
+    .then((response) => {
+    console.log(response)
+    response.text().then(function (text) {
+    employeeTable.innerHTML = text;
+	});
+    
+    }
+   )
+}
+ 
+ 
+ function showMakeEmployeeForm (event){
+	 divMakeEmployee.classList.toggle("hidden");
+ }
+ 
+ function updateTicketsOnSubmit (event){
+		event.preventDefault();
+	  	var url = "http://localhost:8080/Reimbursement/UpdateStatus?";
+		const T = document.getElementsByClassName("reimbType");
+		
+		for(t of T ){
+			const a = document.getElementById(t.id);
+			url += "&" + t.id + "=" + a.value;
+		}
+		url += "&remIdList=";
+		const ril = [];
+		for(t of T ){
+			var a = t.id;
+			ril.push( a.replace("type", ""));
+		}
+		url += ril.join("+") + "&resolverId=" + reimbResolverId.value
+	
+	  	fetch(url , {method: 'POST'})
+	    .then((response) => {
+	    response.text().then(function (text) {
+	    alert("Updates complete")
+		});
+	    
+	    }
+	   )
+	}
+
+	 </script>
+</html>
